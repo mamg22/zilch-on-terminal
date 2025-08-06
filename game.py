@@ -196,11 +196,12 @@ class Game:
                     results["unused"] = hand.unused
                     self.state = State.TurnSelect
                 elif data.get("bank"):
-                    if not score and self.cumulative_score < self.BANK_MIN:
+                    new_score = self.cumulative_score + score
+                    if new_score < self.BANK_MIN:
                         results["banked"] = None
                         self.state = State.TurnSelect
                     else:
-                        self.cumulative_score += score
+                        self.cumulative_score = new_score
 
                         results["banked"] = self.cumulative_score
                         results["player_switch"] = True
