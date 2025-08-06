@@ -1,0 +1,13 @@
+Die.picked {
+    color: yellow;
+    border: yellow;
+}
+
+Die.used {
+    color: gray;
+    border: gray;
+}
+
+DataTable {
+    height: 10;
+}
