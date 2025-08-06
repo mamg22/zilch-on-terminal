@@ -109,7 +109,10 @@ class Zot(App):
             if score is None:
                 messages.append("Please select some scoring dice")
             elif "zilch" in result:
-                messages.append(f"Zilched! Lost {result['score']} points")
+                msg = "Zilched!"
+                if "triple_zilch" in result:
+                    msg += " Lost 300 points!"
+                messages.append(msg)
             else:
                 messages.append(f"Got {score} points")
 
