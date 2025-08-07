@@ -118,6 +118,12 @@ class Zot(App):
 
         if "freeroll" in result:
             messages.append("Free roll!")
+        if "winning" in result:
+            player = result["winning"]
+            messages.append(f"{player.name} has reached the score limit! Last chance!")
+        if "win" in result:
+            player = result["win"]
+            messages.append(f"{player.name} wins!")
         if "player_switch" in result:
             messages.append(f"{self.game.current_player.name}'s turn!")
         self.logs.write_lines(messages, scroll_end=True)

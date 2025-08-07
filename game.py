@@ -117,11 +117,15 @@ class Player:
             self.zilch_streak = 0
             return True
 
+    def total_score(self) -> int:
+        return sum(self.scores)
+
 
 class State(Enum):
     TurnStart = auto()
     TurnSelect = auto()
     TurnResult = auto()
+    GameEnd = auto()
 
 
 class Game:
@@ -134,6 +138,7 @@ class Game:
     players: list[Player]
     current_player: Player
     previous_player: Player
+    winning_player: Player | None
 
     SCORE_LIMIT = 10000
     BANK_MIN = 300
@@ -148,6 +153,7 @@ class Game:
         self.players = list(players)
         self.current_player = self.players[0]
         self.previous_player = self.players[-1]
+        self.winning_player = None
 
     def roll(self) -> None:
         for idx, die in enumerate(self.dice):
@@ -160,8 +166,12 @@ class Game:
 
         match self.state:
             case State.TurnStart:
-                self.roll()
-                self.state = State.TurnSelect
+                if self.winning_player is self.current_player:
+                    results["win"] = self.winning_player
+                    self.state = State.GameEnd
+                else:
+                    self.roll()
+                    self.state = State.TurnSelect
 
             case State.TurnSelect:
                 if (
@@ -204,9 +214,23 @@ class Game:
                         self.cumulative_score = new_score
 
                         results["banked"] = self.cumulative_score
-                        results["player_switch"] = True
                         self.current_player.add_score(self.cumulative_score)
+
+                        total = self.current_player.total_score()
+
+                        if self.winning_player is not None and total > self.winning_player.total_score():
+                            results["win"] = self.current_player
+                            self.state = State.GameEnd
+
+                            return results
+
+                        if self.winning_player is None and self.current_player.total_score() >= self.SCORE_LIMIT:
+                            self.winning_player = self.current_player
+                            results["winning"] = self.current_player
+
+
                         self.next_player()
+                        results["player_switch"] = True
 
                         self.picks = set()
                         self.used = set()
