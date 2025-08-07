@@ -64,7 +64,7 @@ class Zot(App):
 
     def __init__(self) -> None:
         super().__init__()
-        self.table = DataTable()
+        self.table = DataTable(cell_padding=1, cursor_type="none")
         self.logs = Log()
         self.game = game.Game([game.Player("Player A"), game.Player("Player B")])
         self.game.step()
@@ -140,6 +140,9 @@ class Zot(App):
 
     def update_scores(self):
         self.table.clear()
+
+        self.table.add_row("Total", *(p.total_score() for p in self.game.players))
+        self.table.fixed_rows = 1
 
         for round, scores in enumerate(
             zip_longest(*(player.scores for player in self.game.players)), start=1
